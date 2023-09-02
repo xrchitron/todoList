@@ -1,12 +1,20 @@
 const express = require("express");
 const app = express();
+const port = 3000;
+
+const db = require("./models");
+const Todo = db.Todo;
 
 app.get("/", (req, res) => {
   res.send("hello world");
 });
 
 app.get("/todos", (req, res) => {
-  res.send("get all todos");
+  return Todo.findAll()
+    .then((todos) => res.send({ todos }))
+    .catch((err) => {
+      res.status(422).json(err);
+    });
 });
 
 app.get("/todos/:id", (req, res) => {
@@ -33,6 +41,6 @@ app.delete("/todos/:id", (req, res) => {
   res.send(`todos id: ${req.params.id} has been deleted`);
 });
 
-app.listen(3000, () => {
-  console.log("App is running on port 3000");
+app.listen(port, () => {
+  console.log(`App is running on port ${port}`);
 });
