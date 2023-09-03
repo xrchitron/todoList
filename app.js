@@ -64,9 +64,27 @@ app.post(
   })
 );
 
-app.get("/todos/:id", (req, res) => {
-  res.send(`get todo id: ${req.params.id}`);
-});
+// app.get("/todos/:id", (req, res) => {
+//   const id = req.params.id;
+//   return Todo.findByPk(id, {
+//     attributes: ["id", "name"],
+//     raw: true,
+//   })
+//     .then((todo) => res.render("todo", { todo }))
+//     .catch((err) => console.log(err));
+// });
+
+app.get(
+  "/todos/:id",
+  asyncHandler(async (req, res) => {
+    const id = req.params.id;
+    const todo = await Todo.findByPk(id, {
+      attributes: ["id", "name"],
+      raw: true,
+    });
+    res.render("todo", { todo });
+  })
+);
 
 app.get("/todos/:id/edit", (req, res) => {
   res.send(`get todo edit: ${req.params.id}`);
