@@ -16,16 +16,29 @@ app.get("/", (req, res) => {
   res.render("index");
 });
 
-app.get("/todos", (req, res) => {
-  return Todo.findAll({
-    attributes: ["id", "name"],
-    raw: true,
-  })
-    .then((todos) => res.render("todos", { todos }))
-    .catch((err) => {
-      res.status(422).json(err);
+//class version
+// app.get("/todos", (req, res) => {
+//   return Todo.findAll({
+//     attributes: ["id", "name"],
+//     raw: true,
+//   })
+//     .then((todos) => res.render("todos", { todos }))
+//     .catch((err) => {
+//       res.status(422).json(err);
+//     });
+// });
+
+//with asyncHandler and async / await method
+app.get(
+  "/todos",
+  asyncHandler(async (req, res) => {
+    const todos = await Todo.findAll({
+      attributes: ["id", "name"],
+      raw: true,
     });
-});
+    res.render("todos", { todos });
+  })
+);
 
 app.get("/todos/new", (req, res) => {
   return res.render("new");
