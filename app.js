@@ -10,7 +10,7 @@ const Todo = db.Todo;
 app.engine(".hbs", engine({ extname: ".hbs" }));
 app.set("view engine", ".hbs");
 app.set("views", "./views");
-
+app.use(express.urlencoded({ extended: true }));
 app.get("/", (req, res) => {
   res.render("index");
 });
@@ -26,20 +26,23 @@ app.get("/todos", (req, res) => {
     });
 });
 
+app.get("/todos/new", (req, res) => {
+  return res.render("new");
+});
+
+app.post("/todos", (req, res) => {
+  const name = req.body.name;
+  return Todo.create({ name })
+    .then(() => res.redirect("/todos"))
+    .catch((err) => console.log(err));
+});
+
 app.get("/todos/:id", (req, res) => {
   res.send(`get todo id: ${req.params.id}`);
 });
 
 app.get("/todos/:id/edit", (req, res) => {
   res.send(`get todo edit: ${req.params.id}`);
-});
-
-app.get("/todos/new", (req, res) => {
-  res.send("create new todo");
-});
-
-app.post("/todos", (req, res) => {
-  res.send("send todo");
 });
 
 app.put("/todos/:id", (req, res) => {
