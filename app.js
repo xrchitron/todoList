@@ -125,9 +125,14 @@ app.put(
   })
 );
 
-app.delete("/todos/:id", (req, res) => {
-  res.send(`todos id: ${req.params.id} has been deleted`);
-});
+app.delete(
+  "/todos/:id",
+  asyncHandler(async (req, res) => {
+    const id = req.params.id;
+    await Todo.destroy({ where: { id } });
+    res.redirect("/todos");
+  })
+);
 
 app.listen(port, () => {
   console.log(`App is running on port ${port}`);
