@@ -1,5 +1,6 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
+const methodOverride = require("method-override");
 const app = express();
 const port = 3000;
 
@@ -12,6 +13,8 @@ app.engine(".hbs", engine({ extname: ".hbs" }));
 app.set("view engine", ".hbs");
 app.set("views", "./views");
 app.use(express.urlencoded({ extended: true }));
+app.use(methodOverride("_method"));
+
 app.get("/", (req, res) => {
   res.render("index");
 });
@@ -86,13 +89,41 @@ app.get(
   })
 );
 
-app.get("/todos/:id/edit", (req, res) => {
-  res.send(`get todo edit: ${req.params.id}`);
-});
+// app.get("/todos/:id/edit", (req, res) => {
+//   const id = req.params.id;
+//   return Todo.findByPk(id, {
+//     attributes: ["id", "name"],
+//     raw: true,
+//   }).then((todo) => res.render("edit", { todo }));
+// });
 
-app.put("/todos/:id", (req, res) => {
-  res.send(`todo id: ${req.params.id} has been modified`);
-});
+app.get(
+  "/todos/:id/edit",
+  asyncHandler(async (req, res) => {
+    const id = req.params.id;
+    const todo = await Todo.findByPk(id, {
+      attributes: ["id", "name"],
+      raw: true,
+    });
+    res.render("edit", { todo });
+  })
+);
+
+// app.put("/todos/:id", (req, res) => {
+//   const name = req.body.name;
+//   const id = req.params.id;
+//   return Todo.update({ name }, { where: { id } }).then(() => res.redirect(`/todos/${id}`));
+// });
+
+app.put(
+  "/todos/:id",
+  asyncHandler(async (req, res) => {
+    const name = req.body.name;
+    const id = req.params.id;
+    await Todo.update({ name }, { where: { id } });
+    res.redirect(`/todos/${id}`);
+  })
+);
 
 app.delete("/todos/:id", (req, res) => {
   res.send(`todos id: ${req.params.id} has been deleted`);
