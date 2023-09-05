@@ -36,7 +36,7 @@ app.get(
   "/todos",
   asyncHandler(async (req, res) => {
     const todos = await Todo.findAll({
-      attributes: ["id", "name"],
+      attributes: ["id", "name", "isComplete"],
       raw: true,
     });
     res.render("todos", { todos });
@@ -82,7 +82,7 @@ app.get(
   asyncHandler(async (req, res) => {
     const id = req.params.id;
     const todo = await Todo.findByPk(id, {
-      attributes: ["id", "name"],
+      attributes: ["id", "name", "isComplete"],
       raw: true,
     });
     res.render("todo", { todo });
@@ -102,7 +102,7 @@ app.get(
   asyncHandler(async (req, res) => {
     const id = req.params.id;
     const todo = await Todo.findByPk(id, {
-      attributes: ["id", "name"],
+      attributes: ["id", "name", "isComplete"],
       raw: true,
     });
     res.render("edit", { todo });
@@ -118,9 +118,9 @@ app.get(
 app.put(
   "/todos/:id",
   asyncHandler(async (req, res) => {
-    const name = req.body.name;
+    const { name, isComplete } = req.body;
     const id = req.params.id;
-    await Todo.update({ name }, { where: { id } });
+    await Todo.update({ name, isComplete: isComplete === "completed" }, { where: { id } });
     res.redirect(`/todos/${id}`);
   })
 );
