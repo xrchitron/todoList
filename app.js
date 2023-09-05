@@ -1,6 +1,8 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
 const methodOverride = require("method-override");
+const flash = require("connect-flash");
+const session = require("express-session");
 const app = express();
 const port = 3000;
 
@@ -14,6 +16,14 @@ app.set("view engine", ".hbs");
 app.set("views", "./views");
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
+app.use(
+  session({
+    secret: "ThisIsSecret",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+app.use(flash());
 
 app.get("/", (req, res) => {
   res.render("index");
@@ -39,7 +49,7 @@ app.get(
       attributes: ["id", "name", "isComplete"],
       raw: true,
     });
-    res.render("todos", { todos });
+    res.render("todos", { todos, message: req.flash("success") });
   })
 );
 
@@ -63,6 +73,7 @@ app.post(
     const name = req.body.name;
     const showName = await Todo.create({ name });
     console.log(showName.toJSON());
+    req.flash("success", "Add successfully");
     res.redirect("/todos");
   })
 );
@@ -85,7 +96,7 @@ app.get(
       attributes: ["id", "name", "isComplete"],
       raw: true,
     });
-    res.render("todo", { todo });
+    res.render("todo", { todo, message: req.flash("success") });
   })
 );
 
@@ -121,6 +132,7 @@ app.put(
     const { name, isComplete } = req.body;
     const id = req.params.id;
     await Todo.update({ name, isComplete: isComplete === "completed" }, { where: { id } });
+    req.flash("success", "Update successfully");
     res.redirect(`/todos/${id}`);
   })
 );
@@ -130,6 +142,7 @@ app.delete(
   asyncHandler(async (req, res) => {
     const id = req.params.id;
     await Todo.destroy({ where: { id } });
+    req.flash("success", "Delete successfully");
     res.redirect("/todos");
   })
 );
