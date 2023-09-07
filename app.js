@@ -12,7 +12,6 @@ const port = 3000;
 if (process.env.NODE_ENV === "development") {
   require("dotenv").config();
 }
-console.log("env", process.env.SESSION_SECRET);
 
 app.engine(".hbs", engine({ extname: ".hbs" }));
 app.set("view engine", ".hbs");
