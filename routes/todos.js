@@ -3,31 +3,24 @@ const router = express.Router();
 const db = require("../models");
 const Todo = db.Todo;
 
-router.get("/", async (req, res) => {
+router.get("/", async (req, res, next) => {
   try {
     const todos = await Todo.findAll({
       attributes: ["id", "name", "isComplete"],
       raw: true,
     });
-    res.render("todos", { todos, message: req.flash("success") });
+    res.render("todos", { todos });
   } catch (error) {
-    console.log(error);
-    req.flash("error", "server error");
-    res.redirect("back");
+    error.errorMessage = "Server error";
+    next(error);
   }
 });
 
 router.get("/new", (req, res) => {
-  try {
-    return res.render("new", { error: req.flash("error") });
-  } catch (error) {
-    console.log(error);
-    req.flash("error", "server error");
-    res.redirect("back");
-  }
+  return res.render("new");
 });
 
-router.post("/", async (req, res) => {
+router.post("/", async (req, res, next) => {
   try {
     const name = req.body.name;
     const showName = await Todo.create({ name });
@@ -35,25 +28,22 @@ router.post("/", async (req, res) => {
     req.flash("success", "Add successfully");
     res.redirect("/todos");
   } catch (error) {
-    console.log(error);
-    req.flash("error", "over-length");
-    // res.redirect("/todos/new"); is also fine
-    res.redirect("back");
+    error.errorMessage = "over-length";
+    next(error);
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req, res, next) => {
   try {
     const id = req.params.id;
     const todo = await Todo.findByPk(id, {
       attributes: ["id", "name", "isComplete"],
       raw: true,
     });
-    res.render("todo", { todo, message: req.flash("success") });
+    res.render("todo", { todo });
   } catch (error) {
-    console.log(error);
-    req.flash("error", "server error");
-    res.redirect("back");
+    error.errorMessage = "server error";
+    next(error);
   }
 });
 
@@ -66,13 +56,12 @@ router.get("/:id/edit", async (req, res) => {
     });
     res.render("edit", { todo });
   } catch (error) {
-    console.log(error);
-    req.flash("error", "server error");
-    res.redirect("back");
+    error.errorMessage = "Server error";
+    next(error);
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", async (req, res, next) => {
   try {
     const { name, isComplete } = req.body;
     const id = req.params.id;
@@ -80,22 +69,20 @@ router.put("/:id", async (req, res) => {
     req.flash("success", "Update successfully");
     res.redirect(`/todos/${id}`);
   } catch (error) {
-    console.log(error);
-    req.flash("error", "server error");
-    res.redirect("back");
+    error.errorMessage = "Server error";
+    next(error);
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req, res, next) => {
   try {
     const id = req.params.id;
     await Todo.destroy({ where: { id } });
     req.flash("success", "Delete successfully");
     res.redirect("/todos");
   } catch (error) {
-    console.log(error);
-    req.flash("error", "delete unsuccessfully");
-    res.redirect("back");
+    error.errorMessage = "Delete unsuccessfully";
+    next(error);
   }
 });
 module.exports = router;

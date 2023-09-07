@@ -5,6 +5,8 @@ const flash = require("connect-flash");
 const session = require("express-session");
 const router = require("./routes"); //index.js would be found automatically
 const { engine } = require("express-handlebars"); //view template engine
+const messageHandler = require("./middlewares/message-handler");
+const errorHandler = require("./middlewares/error-handler");
 const app = express();
 const port = 3000;
 
@@ -21,7 +23,10 @@ app.use(
   })
 );
 app.use(flash());
+
+app.use(messageHandler);
 app.use(router); //invoke router
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`App is running on port http://localhost:${port}`);
