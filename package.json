@@ -7,7 +7,7 @@
     "start": "node app.js",
     "start:dev": "NODE_ENV=development node app.js",
     "dev": "NODE_ENV=development nodemon app.js",
-    "migrate": "npx sequelize-cli db:migrate",
+    "migrate": "NODE_ENV=development npx sequelize-cli db:migrate",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

@@ -2,6 +2,7 @@
   <div class="card" style="width: 80%; margin: 0 auto;">
     <div class="card-body">
       <h5 class="card-title">Register</h5>
+      {{> message}}
       <form action="/users" method="post">
         <div class="mb-3">
           <label for="userName" class="form-label">Name</label>
@@ -36,12 +37,13 @@
           />
         </div>
         <div class="mb-3">
-          <label for="userPassword" class="form-label">Confirm password</label>
+          <label for="confirmPassword" class="form-label">Confirm password</label>
           <input
             type="password"
             class="form-control"
-            id="userPassword"
-            placeholder="Enter password"
+            id="confirmPassword"
+            name="confirmPassword"
+            placeholder="Confirm password"
           />
         </div>
         <button type="submit" class="btn btn-primary">Register</button>
