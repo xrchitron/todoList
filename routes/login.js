@@ -17,10 +17,7 @@ router.get("/register", (req, res) => {
 
 router.post("/users", async (req, res, next) => {
   try {
-    const name = req.body.userName;
-    const email = req.body.userEmail;
-    const password = req.body.userPassword;
-    const confirmPassword = req.body.confirmPassword;
+    const { name, email, password, confirmPassword } = req.body;
     if (!email || !password) {
       req.flash("register", "email and password are required");
       return res.redirect("back");
@@ -40,7 +37,7 @@ router.post("/users", async (req, res, next) => {
     req.flash("register", "register successfully");
     res.redirect("login");
   } catch (error) {
-    error.errorMessage = "server error";
+    error.errorMessage = "register error";
     next(error);
   }
 });
