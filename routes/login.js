@@ -3,13 +3,43 @@ const router = express.Router();
 const db = require("../models");
 const User = db.User;
 
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+
+passport.use(
+  new LocalStrategy({ usernameField: "email" }, (username, password, done) => {
+    return User.findOne({
+      attributes: ["id", "name", "email", "password"],
+      where: { email: username },
+      raw: true,
+    })
+      .then((user) => {
+        if (!user || user.password !== password) {
+          return done(null, false, { message: "email or password incorrect" });
+        }
+        return done(null, user);
+      })
+      .catch((error) => done(error));
+  })
+);
+
+passport.serializeUser((user, done) => {
+  const { id, name, email } = user;
+  return done(null, { id, name, email });
+});
+
 router.get("/login", (req, res) => {
   res.render("login");
 });
 
-router.post("/login", (req, res) => {
-  res.send("login success");
-});
+router.post(
+  "/login",
+  passport.authenticate("local", {
+    successRedirect: "/todos",
+    failureRedirect: "/login",
+    failureFlash: true,
+  })
+);
 
 router.get("/register", (req, res) => {
   res.render("register");

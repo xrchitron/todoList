@@ -9,6 +9,7 @@ const messageHandler = require("./middlewares/message-handler");
 const errorHandler = require("./middlewares/error-handler");
 const app = express();
 const port = 3000;
+const passport = require("passport");
 if (process.env.NODE_ENV === "development") {
   require("dotenv").config();
 }
@@ -27,6 +28,7 @@ app.use(
 );
 app.use(flash());
 
+app.use(passport.initialize());
 app.use(messageHandler);
 app.use(router); //invoke router
 app.use(errorHandler);
