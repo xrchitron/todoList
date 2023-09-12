@@ -19,7 +19,10 @@ passport.use(
         }
         return done(null, user);
       })
-      .catch((error) => done(error));
+      .catch((error) => {
+        error.errorMessage = "login failure";
+        done(error);
+      });
   })
 );
 
