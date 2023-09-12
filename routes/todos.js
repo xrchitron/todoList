@@ -9,10 +9,12 @@ router.get("/", async (req, res, next) => {
   try {
     const todos = await Todo.findAll({
       attributes: ["id", "name", "isComplete"],
+      offset: (page - 1) * limit,
+      limit,
       raw: true,
     });
     res.render("todos", {
-      todos: todos.slice((page - 1) * limit, page * limit),
+      todos,
       prev: page > 1 ? page - 1 : page,
       next: page + 1,
       page,
