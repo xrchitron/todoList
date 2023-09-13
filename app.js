@@ -29,8 +29,12 @@ app.use(
 app.use(flash());
 
 app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(messageHandler);
+
 app.use(router); //invoke router
+
 app.use(errorHandler);
 
 app.listen(port, () => {

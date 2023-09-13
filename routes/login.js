@@ -31,6 +31,10 @@ passport.serializeUser((user, done) => {
   return done(null, { id, name, email });
 });
 
+passport.deserializeUser((user, done) => {
+  done(null, { id: user.id });
+});
+
 router.get("/login", (req, res) => {
   res.render("login");
 });
@@ -50,9 +54,16 @@ router.get("/register", (req, res) => {
 
 router.post("/users", register);
 
-router.post("/logout", (req, res) => {
-  res.send("logout get in");
-});
+router.post("/logout", logout);
+
+function logout(req, res) {
+  req.logout((error) => {
+    if (error) {
+      next(error);
+    }
+    return res.redirect("/login");
+  });
+}
 
 function checkRequiredFields(email, password, confirmPassword) {
   if (!email || !password) {
