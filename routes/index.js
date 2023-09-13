@@ -11,7 +11,7 @@ router.use(login);
 router.use("/todos", authHandler, todos);
 
 router.get("/", (req, res) => {
-  res.render("index");
+  res.redirect("/todos");
 });
 
 //export router
