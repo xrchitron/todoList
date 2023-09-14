@@ -6,22 +6,16 @@ const router = express.Router();
 const user = require("./user");
 const todos = require("./todos");
 const authHandler = require("../middlewares/auth-handler");
-const passport = require("passport");
+const oAuth = require("./oAuth");
 
 router.use(user);
 router.use("/todos", authHandler, todos);
+router.use(oAuth);
+router.get("/", renderIndex);
 
-router.get("/", (req, res) => {
-  res.redirect("/todos");
-});
-router.get("/login/facebook", passport.authenticate("facebook", { scope: ["email"] }));
-router.get(
-  "/oauth2/redirect/facebook",
-  passport.authenticate("facebook", {
-    successRedirect: "/todos",
-    failureRedirect: "/login",
-    failureFlash: true,
-  })
-);
 //export router
 module.exports = router;
+
+function renderIndex(req, res) {
+  return res.redirect("/todos");
+}

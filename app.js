@@ -9,7 +9,7 @@ const messageHandler = require("./middlewares/message-handler");
 const errorHandler = require("./middlewares/error-handler");
 const app = express();
 const port = 3000;
-const passport = require("passport");
+const passport = require("./config/passport");
 if (process.env.NODE_ENV === "development") {
   require("dotenv").config();
 }
