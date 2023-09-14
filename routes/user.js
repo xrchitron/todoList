@@ -2,22 +2,32 @@ const express = require("express");
 const router = express.Router();
 const db = require("../models");
 const User = db.User;
+const bcrypt = require("bcryptjs");
 
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 
 passport.use(
   new LocalStrategy({ usernameField: "email" }, (username, password, done) => {
+    //checkExistingUser
     return User.findOne({
       attributes: ["id", "name", "email", "password"],
       where: { email: username },
       raw: true,
     })
       .then((user) => {
-        if (!user || user.password !== password) {
+        //checkExistingUser
+        if (!user) {
           return done(null, false, { message: "email or password incorrect" });
         }
-        return done(null, user);
+        return bcrypt.compare(password, user.password).then((isMatch) => {
+          //checkPasswordMatch
+          if (!isMatch) {
+            return done(null, false, { message: "email or password incorrect" });
+          }
+          //get user info
+          return done(null, user);
+        });
       })
       .catch((error) => {
         error.errorMessage = "login failure";
@@ -55,7 +65,7 @@ router.get("/register", (req, res) => {
 router.post("/users", register);
 
 router.post("/logout", logout);
-
+module.exports = router;
 function logout(req, res) {
   req.logout((error) => {
     if (error) {
@@ -72,20 +82,23 @@ function checkRequiredFields(email, password, confirmPassword) {
   if (password !== confirmPassword) {
     return { status: false, message: "Passwords do not match" };
   }
-  return;
+  return { status: true };
 }
 async function checkExistingUser(email) {
   const checkEmail = await User.findAll({
     where: { email },
     raw: true,
   });
+  console.log(checkEmail.length);
   if (checkEmail.length === 0) {
     return { status: false, message: "Email already exists" };
   }
-  return;
+  return { status: true };
 }
 async function createUser(name, email, password) {
-  await User.create({ name, email, password });
+  //generate hashed password
+  const hash = await bcrypt.hash(password, 10);
+  await User.create({ name, email, password: hash });
   return { status: true, message: "User registered successfully" };
 }
 async function register(req, res, next) {
@@ -99,7 +112,7 @@ async function register(req, res, next) {
     }
 
     const checkUser = await checkExistingUser(email);
-    if (!checkUser.status) {
+    if (checkUser.status) {
       req.flash("register", checkUser.message);
       return res.redirect("back");
     }
@@ -114,5 +127,3 @@ async function register(req, res, next) {
     next(error);
   }
 }
-
-module.exports = router;
